@@ -1,0 +1,8 @@
+node_modules
+Backend/node_modules
+Frontend/node_modules
+Frontend/dist
+.git
+.env
+*.log
+.DS_Store

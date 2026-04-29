@@ -1,0 +1,15 @@
+{
+  "name": "pingfin-regular-bank-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Frontend GUI for PingFin Bank KBC API.",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 5173",
+    "start": "vite --host 0.0.0.0 --port 5173",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 5173"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0"
+  }
+}

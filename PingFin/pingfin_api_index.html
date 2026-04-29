@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PingFin 2026 - Bank KBC API Documentation</title>
+  <style>
+    :root {
+      --blue: #2196f3;
+      --blue-dark: #1565c0;
+      --green: #43a047;
+      --orange: #fb8c00;
+      --red: #e53935;
+      --purple: #5e35b1;
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #667085;
+      --border: #d9e2ef;
+      --code-bg: #0f172a;
+      --code-text: #e5e7eb;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .topbar {
+      height: 72px;
+      background: var(--blue);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-weight: 400;
+      font-size: 32px;
+      letter-spacing: 0.2px;
+    }
+
+    .topbar .help-link {
+      color: #fff;
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.18);
+      padding: 22px 20px;
+      margin-right: -28px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+    }
+
+    .layout {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 42px 20px 80px;
+    }
+
+    .hero {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 34px;
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+    }
+
+    .hero h2 {
+      font-size: 54px;
+      line-height: 1.05;
+      margin: 0 0 18px;
+      font-weight: 300;
+    }
+
+    .hero p {
+      max-width: 920px;
+      margin: 12px 0;
+      color: #263238;
+      font-size: 16px;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .meta-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #f8fbff;
+      padding: 14px;
+    }
+
+    .meta-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+
+    .meta-card strong {
+      font-size: 15px;
+    }
+
+    .notice {
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .notice-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .notice-row:last-child {
+      border-bottom: 0;
+    }
+
+    .icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+      flex: 0 0 auto;
+    }
+
+    .get { background: var(--green); }
+    .post { background: var(--orange); }
+    .put { background: var(--purple); }
+    .danger { background: var(--red); }
+    .info { background: var(--blue); }
+
+    .tools {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      margin-bottom: 18px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .tools input {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 14px;
+      min-width: 0;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 15px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--blue);
+      color: #fff;
+      transition: transform 0.1s ease, opacity 0.1s ease;
+    }
+
+    .btn.secondary {
+      background: #e8effc;
+      color: #164194;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .section-title {
+      font-size: 28px;
+      margin: 30px 0 14px;
+      font-weight: 500;
+    }
+
+    .endpoint-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    details.endpoint {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    details.endpoint summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      user-select: none;
+      position: relative;
+    }
+
+    details.endpoint summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.endpoint summary::after {
+      content: "▾";
+      margin-left: auto;
+      color: #0f172a;
+      font-size: 16px;
+      transition: transform 0.2s ease;
+    }
+
+    details.endpoint[open] summary::after {
+      transform: rotate(180deg);
+    }
+
+    .endpoint-path {
+      font-size: 18px;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .badge {
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      color: #fff;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      min-width: 54px;
+      text-align: center;
+    }
+
+    .badge.GET { background: var(--green); }
+    .badge.POST { background: var(--orange); }
+    .badge.SYSTEM { background: var(--blue); }
+
+    .endpoint-body {
+      border-top: 1px solid var(--border);
+      padding: 0 22px 24px;
+    }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 0 24px;
+      table-layout: fixed;
+    }
+
+    .spec-table th,
+    .spec-table td {
+      text-align: left;
+      vertical-align: top;
+      padding: 15px 8px;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+    }
+
+    .spec-table th {
+      font-size: 14px;
+      color: #111827;
+    }
+
+    .spec-table td {
+      color: #1f2937;
+    }
+
+    .label-blue { color: var(--blue); font-weight: 700; }
+    .label-orange { color: var(--orange); font-weight: 700; }
+    .label-green { color: var(--green); font-weight: 700; }
+    .label-red { color: var(--red); font-weight: 700; }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin: 18px 0;
+    }
+
+    .panel {
+      background: #f8fbff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .panel h4 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .panel p,
+    .panel li {
+      color: #334155;
+      font-size: 14px;
+    }
+
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 16px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    code {
+      font-family: Consolas, Monaco, "Courier New", monospace;
+    }
+
+    .try-result {
+      white-space: pre-wrap;
+      background: #111827;
+      color: #e5e7eb;
+      border-radius: 10px;
+      padding: 14px;
+      min-height: 56px;
+      overflow: auto;
+      max-height: 260px;
+      font-size: 13px;
+    }
+
+    .usecase-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .usecase {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .usecase h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      color: #111827;
+    }
+
+    .usecase p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer {
+      margin-top: 34px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .hero h2 {
+        font-size: 36px;
+      }
+
+      .meta-grid,
+      .two-col,
+      .usecase-grid,
+      .tools {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar h1 {
+        font-size: 24px;
+      }
+
+      .spec-table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <h1>PingFin 2026</h1>
+    <a class="help-link" href="#help">Help</a>
+  </header>
+
+  <main class="layout">
+    <section class="hero">
+      <h2>Bank KBC API Documentation</h2>
+      <p>
+        Deze pagina documenteert de API van onze PingFin regular bank. De bank kan werken als
+        <strong>OB</strong> (Originating Bank) en als <strong>BB</strong> (Beneficiary Bank).
+      </p>
+      <p>
+        De GUI gebruikt deze endpoints om payment orders te genereren, verwerken, loggen en controleren.
+        De database draait in MySQL via Docker en wordt gevuld via <code>init.sql</code>.
+      </p>
+
+      <div class="meta-grid">
+        <div class="meta-card"><span>Team</span><strong>Bank KBC</strong></div>
+        <div class="meta-card"><span>BIC</span><strong>BARCBEBB</strong></div>
+        <div class="meta-card"><span>Docker port</span><strong>8082 → 80</strong></div>
+        <div class="meta-card"><span>Database</span><strong>pingfindb</strong></div>
+      </div>
+    </section>
+
+    <section class="notice" id="help">
+      <div class="notice-row"><span class="icon get">G</span><span>Groene endpoints gebruiken de <strong>GET</strong> method.</span></div>
+      <div class="notice-row"><span class="icon post">P</span><span>Oranje endpoints gebruiken de <strong>POST</strong> method en verwachten meestal een JSON body met <code>{ "data": [...] }</code>.</span></div>
+      <div class="notice-row"><span class="icon info">i</span><span>Alle responses gebruiken de vaste PingFin response structuur: <code>ok</code>, <code>status</code>, <code>code</code>, <code>message</code>, <code>data</code>.</span></div>
+    </section>
+
+    <section class="tools">
+      <input id="baseUrl" value="http://localhost:8082" aria-label="API base URL" />
+      <button class="btn secondary" onclick="saveBaseUrl()">Save base URL</button>
+      <button class="btn" onclick="testEndpoint('/api/info/', 'GET')">Test API</button>
+    </section>
+
+    <h2 class="section-title">Core endpoints</h2>
+    <section class="endpoint-list" id="core-endpoints"></section>
+
+    <h2 class="section-title">OB Flow endpoints</h2>
+    <section class="endpoint-list" id="ob-endpoints"></section>
+
+    <h2 class="section-title">BB Flow endpoints</h2>
+    <section class="endpoint-list" id="bb-endpoints"></section>
+
+    <h2 class="section-title">Monitoring endpoints</h2>
+    <section class="endpoint-list" id="monitoring-endpoints"></section>
+
+    <h2 class="section-title">Use cases</h2>
+    <section class="usecase-grid">
+      <div class="usecase">
+        <h3>UC1 — OB validation fails</h3>
+        <p>PO_NEW wordt FAILED, geen PO_OUT, fout wordt gelogd.</p>
+      </div>
+      <div class="usecase">
+        <h3>UC2 — Internal payment</h3>
+        <p>OA en BA zitten bij Bank KBC. ACCOUNTS en TRANSACTIONS worden aangepast.</p>
+      </div>
+      <div class="usecase">
+        <h3>UC3 — CB validation fails</h3>
+        <p>Externe PO gaat naar PO_OUT, daarna negatieve ACK_IN door CB-fout.</p>
+      </div>
+      <div class="usecase">
+        <h3>UC4 — BB validation fails</h3>
+        <p>Inkomende PO faalt bij BA-validatie en maakt ACK_OUT FAILED.</p>
+      </div>
+      <div class="usecase">
+        <h3>UC5 — All validations pass</h3>
+        <p>Succesvolle externe betaling met ACK success en correcte transaction records.</p>
+      </div>
+    </section>
+
+    <h2 class="section-title">Response format</h2>
+    <pre><code>{
+  "ok": true,
+  "status": 200,
+  "code": "2000",
+  "message": "OK",
+  "data": []
+}</code></pre>
+
+    <h2 class="section-title">Payment Order message format</h2>
+    <pre><code>{
+  "po_id": "BARCBEBB_20260429_001",
+  "po_amount": 100.00,
+  "po_message": "Test run - manual payment",
+  "po_datetime": "2026-04-29 10:15:00",
+  "ob_id": "BARCBEBB",
+  "oa_id": "BE64096123456701",
+  "ob_code": null,
+  "ob_datetime": null,
+  "cb_code": null,
+  "cb_datetime": null,
+  "bb_id": "DEGRBEBB",
+  "ba_id": "BE37096123456702",
+  "bb_code": null,
+  "bb_datetime": null
+}</code></pre>
+
+    <h2 class="section-title">Live test result</h2>
+    <div id="result" class="try-result">Klik op "Test API" of op een Try-knop bij een endpoint.</div>
+
+    <p class="footer">
+      Bank KBC · PingFin 2026 · Node.js Express · MySQL Docker · Port 8082
+    </p>
+  </main>
+
+  <script>
+    const endpoints = {
+      core: [
+        {
+          method: "GET",
+          path: "/api/help/",
+          title: "API overview",
+          body: "-",
+          tables: "-",
+          useCases: "Algemeen",
+          when: "Gebruik dit endpoint om een overzicht te krijgen van alle beschikbare API methods.",
+          example: `fetch(BASE_URL + "/api/help/").then(r => r.json())`
+        },
+        {
+          method: "GET",
+          path: "/api/info/",
+          title: "Bank info / health check",
+          body: "-",
+          tables: "Environment variables",
+          useCases: "Deployment check",
+          when: "Gebruik dit endpoint om te controleren of de container correct draait. Het netwerkteam kan dit als health endpoint gebruiken.",
+          example: `fetch(BASE_URL + "/api/info/").then(r => r.json())`
+        },
+        {
+          method: "GET",
+          path: "/api/db_check/",
+          title: "Database connection check",
+          body: "-",
+          tables: "MySQL connection",
+          useCases: "Debugging",
+          when: "Gebruik dit endpoint om te controleren of de API met de MySQL database-container kan verbinden.",
+          example: `fetch(BASE_URL + "/api/db_check/").then(r => r.json())`
+        },
+        {
+          method: "GET",
+          path: "/api/accounts/",
+          title: "Get all accounts",
+          body: "-",
+          tables: "ACCOUNTS",
+          useCases: "UC1, UC2, UC5",
+          when: "Gebruik dit endpoint om alle rekeningen en saldo's van de bank te tonen.",
+          example: `fetch(BASE_URL + "/api/accounts/").then(r => r.json())`
+        },
+        {
+          method: "GET",
+          path: "/api/accounts/:iban",
+          title: "Get account by IBAN",
+          body: "-",
+          tables: "ACCOUNTS",
+          useCases: "UC1, UC2, UC5",
+          when: "Gebruik dit endpoint om één specifieke rekening te controleren.",
+          example: `fetch(BASE_URL + "/api/accounts/BE64096123456701").then(r => r.json())`
+        }
+      ],
+      ob: [
+        {
+          method: "GET",
+          path: "/api/po_new/",
+          title: "Get PO_NEW",
+          body: "-",
+          tables: "PO_NEW",
+          useCases: "UC1 - UC5",
+          when: "Gebruik dit endpoint om te zien welke payment orders door onze bank zijn aangemaakt.",
+          example: `fetch(BASE_URL + "/api/po_new/").then(r => r.json())`
+        },
+        {
+          method: "POST",
+          path: "/api/po_new_add/",
+          title: "Add new payment orders",
+          body: `{
+  "data": [
+    {
+      "po_amount": 100,
+      "po_message": "Manual internal payment",
+      "oa_id": "BE64096123456701",
+      "bb_id": "BARCBEBB",
+      "ba_id": "BE37096123456702"
+    }
+  ]
+}`,
+          tables: "PO_NEW, LOG",
+          useCases: "UC1 - UC5",
+          when: "Gebruik dit endpoint om manueel één of meerdere payment orders in PO_NEW te zetten.",
+          example: `fetch(BASE_URL + "/api/po_new_add/", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    data: [{
+      po_amount: 100,
+      po_message: "Manual internal payment",
+      oa_id: "BE64096123456701",
+      bb_id: "BARCBEBB",
+      ba_id: "BE37096123456702"
+    }]
+  })
+}).then(r => r.json())`
+        },
+        {
+          method: "GET",
+          path: "/api/po_new_generate/?count=10",
+          title: "Generate random payment orders",
+          body: "-",
+          tables: "ACCOUNTS, PO_NEW, LOG",
+          useCases: "UC1 - UC5",
+          when: "Gebruik dit endpoint om random testdata te maken: interne betaling, onbekende OA, onbekende BB, onbekende BA en correcte externe betaling.",
+          example: `fetch(BASE_URL + "/api/po_new_generate/?count=10").then(r => r.json())`
+        },
+        {
+          method: "GET",
+          path: "/api/po_new_process/",
+          title: "Process PO_NEW",
+          body: "-",
+          tables: "PO_NEW, PO_OUT, ACCOUNTS, TRANSACTIONS, LOG",
+          useCases: "UC1, UC2, UC3, UC4, UC5",
+          when: "Gebruik dit endpoint na het toevoegen of genereren van PO's. Het valideert PO_NEW en verwerkt interne of externe betalingen.",
+          example: `fetch(BASE_URL + "/api/po_new_process/").then(r => r.json())`
+        },
+        {
+          method: "GET",
+          path: "/api/po_out/",
+          title: "Get PO_OUT",
+          body: "-",
+          tables: "PO_OUT",
+          useCases: "UC3, UC4, UC5",
+          when: "Gebruik dit endpoint om externe betalingen te zien die klaarstaan richting Clearing Bank.",
+          example: `fetch(BASE_URL + "/api/po_out/").then(r => r.json())`
+        },
+        {
+          method: "POST",
+          path: "/api/ack_in_add/",
+          title: "Add incoming ACK",
+          body: `{
+  "data": [
+    {
+      "po_id": "BARCBEBB_TEST_001",
+      "po_amount": 125,
+      "po_message": "UC5 success",
+      "ob_id": "BARCBEBB",
+      "oa_id": "BE64096123456701",
+      "ob_code": "2000",
+      "cb_code": "2000",
+      "bb_id": "DEGRBEBB",
+      "ba_id": "BE37096123456702",
+      "bb_code": "2000",
+      "ack_status": "SUCCESS"
+    }
+  ]
+}`,
+          tables: "ACK_IN, TRANSACTIONS, ACCOUNTS, LOG",
+          useCases: "UC3, UC4, UC5",
+          when: "Gebruik dit endpoint om lokaal te simuleren dat de Clearing Bank een ACK terugstuurt naar onze bank als OB.",
+          example: `fetch(BASE_URL + "/api/ack_in_add/", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    data: [{
+      po_id: "BARCBEBB_TEST_001",
+      po_amount: 125,
+      po_message: "UC5 success",
+      ob_id: "BARCBEBB",
+      oa_id: "BE64096123456701",
+      ob_code: "2000",
+      cb_code: "2000",
+      bb_id: "DEGRBEBB",
+      ba_id: "BE37096123456702",
+      bb_code: "2000",
+      ack_status: "SUCCESS"
+    }]
+  })
+}).then(r => r.json())`
+        },
+        {
+          method: "GET",
+          path: "/api/ack_in/",
+          title: "Get ACK_IN",
+          body: "-",
+          tables: "ACK_IN",
+          useCases: "UC3, UC4, UC5",
+          when: "Gebruik dit endpoint om de acknowledgements te bekijken die onze bank als OB heeft ontvangen.",
+          example: `fetch(BASE_URL + "/api/ack_in/").then(r => r.json())`
+        }
+      ],
+      bb: [
+        {
+          method: "POST",
+          path: "/api/po_in_add/",
+          title: "Add incoming PO",
+          body: `{
+  "data": [
+    {
+      "po_id": "DEGRBEBB_TEST_001",
+      "po_amount": 90,
+      "po_message": "Incoming payment",
+      "ob_id": "DEGRBEBB",
+      "oa_id": "BE42096123456709",
+      "ob_code": "2000",
+      "cb_code": "2000",
+      "bb_id": "BARCBEBB",
+      "ba_id": "BE15096123456710"
+    }
+  ]
+}`,
+          tables: "PO_IN, LOG",
+          useCases: "UC4, UC5",
+          when: "Gebruik dit endpoint om lokaal te simuleren dat de Clearing Bank een PO naar onze bank stuurt als BB.",
+          example: `fetch(BASE_URL + "/api/po_in_add/", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    data: [{
+      po_id: "DEGRBEBB_TEST_001",
+      po_amount: 90,
+      po_message: "Incoming payment",
+      ob_id: "DEGRBEBB",
+      oa_id: "BE42096123456709",
+      ob_code: "2000",
+      cb_code: "2000",
+      bb_id: "BARCBEBB",
+      ba_id: "BE15096123456710"
+    }]
+  })
+}).then(r => r.json())`
+        },
+        {
+          method: "GET",
+          path: "/api/po_in/",
+          title: "Get PO_IN",
+          body: "-",
+          tables: "PO_IN",
+          useCases: "UC4, UC5",
+          when: "Gebruik dit endpoint om inkomende payment orders te bekijken.",
+          example: `fetch(BASE_URL + "/api/po_in/").then(r => r.json())`
+        },
+        {
+          method: "GET",
+          path: "/api/po_in_process/",
+          title: "Process PO_IN",
+          body: "-",
+          tables: "PO_IN, ACK_OUT, ACCOUNTS, TRANSACTIONS, LOG",
+          useCases: "UC4, UC5",
+          when: "Gebruik dit endpoint om inkomende betalingen als BB te valideren en te verwerken.",
+          example: `fetch(BASE_URL + "/api/po_in_process/").then(r => r.json())`
+        },
+        {
+          method: "GET",
+          path: "/api/ack_out/",
+          title: "Get ACK_OUT",
+          body: "-",
+          tables: "ACK_OUT",
+          useCases: "UC4, UC5",
+          when: "Gebruik dit endpoint om acknowledgements te bekijken die onze bank als BB zou terugsturen naar de Clearing Bank.",
+          example: `fetch(BASE_URL + "/api/ack_out/").then(r => r.json())`
+        }
+      ],
+      monitoring: [
+        {
+          method: "GET",
+          path: "/api/transactions/",
+          title: "Get transactions",
+          body: "-",
+          tables: "TRANSACTIONS",
+          useCases: "UC1 - UC5",
+          when: "Gebruik dit endpoint om succesvolle en gefaalde transactie-records te controleren.",
+          example: `fetch(BASE_URL + "/api/transactions/").then(r => r.json())`
+        },
+        {
+          method: "GET",
+          path: "/api/logs/",
+          title: "Get logs",
+          body: "-",
+          tables: "LOG",
+          useCases: "UC1 - UC5 + exceptions",
+          when: "Gebruik dit endpoint om de audit trail te bekijken: acties, fouten, inkomende en uitgaande berichten.",
+          example: `fetch(BASE_URL + "/api/logs/").then(r => r.json())`
+        },
+        {
+          method: "GET",
+          path: "/api/outstanding/",
+          title: "Get outstanding payments",
+          body: "-",
+          tables: "v_outstanding_payments",
+          useCases: "Exception 1",
+          when: "Gebruik dit endpoint om PO_OUT records te zien waarvoor nog geen ACK_IN bestaat.",
+          example: `fetch(BASE_URL + "/api/outstanding/").then(r => r.json())`
+        },
+        {
+          method: "GET",
+          path: "/api/failed/",
+          title: "Get failed payments",
+          body: "-",
+          tables: "v_failed_payments",
+          useCases: "UC1, UC3, UC4",
+          when: "Gebruik dit endpoint om alle gefaalde betalingen te bekijken.",
+          example: `fetch(BASE_URL + "/api/failed/").then(r => r.json())`
+        }
+      ]
+    };
+
+    const sections = [
+      ["core-endpoints", endpoints.core],
+      ["ob-endpoints", endpoints.ob],
+      ["bb-endpoints", endpoints.bb],
+      ["monitoring-endpoints", endpoints.monitoring]
+    ];
+
+    function getBaseUrl() {
+      return localStorage.getItem("pingfinDocsBaseUrl") || document.getElementById("baseUrl").value || window.location.origin;
+    }
+
+    function saveBaseUrl() {
+      const value = document.getElementById("baseUrl").value.trim().replace(/\/$/, "");
+      localStorage.setItem("pingfinDocsBaseUrl", value);
+      setResult({ ok: true, message: "Base URL saved", data: value });
+    }
+
+    function setResult(value) {
+      document.getElementById("result").textContent =
+        typeof value === "string" ? value : JSON.stringify(value, null, 2);
+    }
+
+    async function testEndpoint(path, method) {
+      const url = getBaseUrl().replace(/\/$/, "") + path;
+      setResult("Loading " + url + " ...");
+
+      try {
+        const response = await fetch(url, { method });
+        const text = await response.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          data = text;
+        }
+        setResult(data);
+      } catch (error) {
+        setResult({
+          ok: false,
+          message: error.message,
+          hint: "Controleer of Docker draait en of de base URL klopt."
+        });
+      }
+    }
+
+    function endpointTemplate(endpoint) {
+      const body = endpoint.body === "-" ? "-" : `<pre><code>${escapeHtml(endpoint.body)}</code></pre>`;
+      const example = endpoint.example.replaceAll("BASE_URL", getBaseUrl().replace(/\/$/, ""));
+      const canTry = endpoint.method === "GET";
+
+      return `
+        <details class="endpoint">
+          <summary>
+            <span class="badge ${endpoint.method}">${endpoint.method}</span>
+            <span class="endpoint-path">${endpoint.path}</span>
+            <span style="color: var(--muted); font-size: 14px;">${endpoint.title}</span>
+          </summary>
+          <div class="endpoint-body">
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th>Return format</th>
+                  <th>Request method</th>
+                  <th>Request headers</th>
+                  <th>Request body</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="label-blue">JSON</span></td>
+                  <td><span class="${endpoint.method === "GET" ? "label-green" : "label-orange"}">${endpoint.method}</span></td>
+                  <td><code>Content-Type: application/json</code></td>
+                  <td>${body}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="two-col">
+              <div class="panel">
+                <h4>When to call?</h4>
+                <p>${endpoint.when}</p>
+              </div>
+              <div class="panel">
+                <h4>Data layer / Use case</h4>
+                <p><strong>Tables:</strong> ${endpoint.tables}</p>
+                <p><strong>Use cases:</strong> ${endpoint.useCases}</p>
+              </div>
+            </div>
+
+            <h4>Example</h4>
+            <pre><code>${escapeHtml(example)}</code></pre>
+
+            ${canTry ? `<button class="btn" onclick="testEndpoint('${endpoint.path}', '${endpoint.method}')">Try ${endpoint.method}</button>` : `<p style="color: var(--muted);">Gebruik Postman/Bruno of de GUI voor deze POST request.</p>`}
+          </div>
+        </details>
+      `;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function render() {
+      const saved = localStorage.getItem("pingfinDocsBaseUrl");
+      if (saved) document.getElementById("baseUrl").value = saved;
+
+      for (const [id, items] of sections) {
+        document.getElementById(id).innerHTML = items.map(endpointTemplate).join("");
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>

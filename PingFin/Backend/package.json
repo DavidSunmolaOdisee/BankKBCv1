@@ -1,0 +1,18 @@
+{
+  "name": "pingfin-regular-bank-api",
+  "version": "1.0.0",
+  "description": "PingFin regular bank API for OB/BB flow using Node.js, Express and MySQL.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "check": "node scripts/check-syntax.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.14.1"
+  }
+}

@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PingFin Bank KBC Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">PF</div>
+        <div>
+          <h1>PingFin</h1>
+          <p>Bank KBC GUI</p>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Hoofdnavigatie">
+        <button class="nav-btn active" data-page="dashboard">Dashboard</button>
+        <button class="nav-btn" data-page="accounts">Accounts</button>
+        <button class="nav-btn" data-page="ob-flow">OB Flow</button>
+        <button class="nav-btn" data-page="bb-flow">BB Flow</button>
+        <button class="nav-btn" data-page="monitoring">Monitoring</button>
+        <button class="nav-btn" data-page="scenarios">Use cases</button>
+        <button class="nav-btn" data-page="docs">API docs</button>
+      </nav>
+
+      <section class="api-panel">
+        <label for="apiBase">API base URL</label>
+        <div class="inline-input">
+          <input id="apiBase" type="text" value="http://localhost:3000" />
+          <button id="saveApiBase" class="small-btn">Save</button>
+        </div>
+        <button id="testConnection" class="ghost-btn full">Test API</button>
+        <p id="connectionStatus" class="connection-status">Nog niet getest</p>
+      </section>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Bank KBC · BARCBEBB · Docker MySQL · Node.js Express</p>
+          <h2 id="pageTitle">Dashboard</h2>
+        </div>
+        <div class="top-actions">
+          <button id="refreshCurrent" class="primary-btn">Refresh</button>
+        </div>
+      </header>
+
+      <section id="toast" class="toast hidden" role="status"></section>
+
+      <section id="dashboard" class="page active-page">
+        <div class="grid stats-grid">
+          <article class="stat-card">
+            <span>Accounts</span>
+            <strong id="statAccounts">-</strong>
+          </article>
+          <article class="stat-card">
+            <span>PO_NEW</span>
+            <strong id="statPoNew">-</strong>
+          </article>
+          <article class="stat-card">
+            <span>PO_OUT</span>
+            <strong id="statPoOut">-</strong>
+          </article>
+          <article class="stat-card warning">
+            <span>Outstanding</span>
+            <strong id="statOutstanding">-</strong>
+          </article>
+          <article class="stat-card danger">
+            <span>Failed</span>
+            <strong id="statFailed">-</strong>
+          </article>
+        </div>
+
+        <div class="grid two-col">
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h3>Snelle acties</h3>
+                <p>Gebruik dit tijdens je demo.</p>
+              </div>
+            </div>
+            <div class="quick-actions">
+              <button data-action="generate10" class="primary-btn">Genereer 10 random PO's</button>
+              <button data-action="processPoNew" class="primary-btn">Verwerk PO_NEW</button>
+              <button data-action="processPoIn" class="primary-btn">Verwerk PO_IN</button>
+              <button data-action="loadOutstanding" class="ghost-btn">Bekijk outstanding</button>
+              <button data-action="loadFailed" class="ghost-btn">Bekijk failed</button>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h3>Laatste logs</h3>
+                <p>Laatste acties uit LOG.</p>
+              </div>
+              <button data-load="logs" class="small-btn">Open</button>
+            </div>
+            <div id="latestLogs" class="mini-list"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="accounts" class="page">
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h3>Accounts</h3>
+              <p>Leest rechtstreeks uit de tabel ACCOUNTS.</p>
+            </div>
+            <button data-load="accounts" class="primary-btn">Laad accounts</button>
+          </div>
+          <div id="accountsTable" class="table-wrap"></div>
+        </section>
+      </section>
+
+      <section id="ob-flow" class="page">
+        <div class="grid two-col">
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h3>Nieuwe PO toevoegen</h3>
+                <p>POST naar /api/po_new_add/ en schrijft naar PO_NEW.</p>
+              </div>
+            </div>
+            <form id="poNewForm" class="form-grid">
+              <label>PO ID optioneel<input name="po_id" placeholder="auto als leeg" /></label>
+              <label>Bedrag<input name="po_amount" type="number" step="0.01" value="100" required /></label>
+              <label>Message<input name="po_message" value="Manual internal payment" required /></label>
+              <label>OA IBAN<input name="oa_id" value="BE64096123456701" required /></label>
+              <label>BB BIC<input name="bb_id" value="BARCBEBB" required /></label>
+              <label>BA IBAN<input name="ba_id" value="BE37096123456702" required /></label>
+              <button class="primary-btn full-row" type="submit">Voeg toe aan PO_NEW</button>
+            </form>
+          </section>
+
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h3>Random PO's</h3>
+                <p>GET /api/po_new_generate/?count=...</p>
+              </div>
+            </div>
+            <form id="generateForm" class="form-grid compact-form">
+              <label>Aantal<input name="count" type="number" min="1" max="50" value="10" /></label>
+              <button class="primary-btn" type="submit">Generate</button>
+            </form>
+            <div class="explain-box">
+              Random generator maakt gemixte testdata voor UC1 tot UC5: onbekende OA, interne betaling, onbekende BB, onbekende BA en correcte externe betaling.
+            </div>
+          </section>
+        </div>
+
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h3>OB tabellen</h3>
+              <p>PO_NEW → PO_OUT / TRANSACTIONS / ACCOUNTS / LOG.</p>
+            </div>
+            <div class="button-row">
+              <button data-load="po_new" class="small-btn">PO_NEW</button>
+              <button data-process="po_new" class="primary-btn">Process PO_NEW</button>
+              <button data-load="po_out" class="small-btn">PO_OUT</button>
+            </div>
+          </div>
+          <div id="obTable" class="table-wrap"></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h3>ACK_IN toevoegen</h3>
+              <p>Simuleert antwoord van de Clearing Bank naar onze bank als OB.</p>
+            </div>
+          </div>
+          <form id="ackInForm" class="form-grid wide-form">
+            <label>PO ID<input name="po_id" value="BARCBEBB_DEMO_ACK" required /></label>
+            <label>Bedrag<input name="po_amount" type="number" step="0.01" value="125" required /></label>
+            <label>Message<input name="po_message" value="UC5 external payment" required /></label>
+            <label>OB BIC<input name="ob_id" value="BARCBEBB" required /></label>
+            <label>OA IBAN<input name="oa_id" value="BE64096123456701" required /></label>
+            <label>OB code<input name="ob_code" value="2000" /></label>
+            <label>CB code<input name="cb_code" value="2000" /></label>
+            <label>BB BIC<input name="bb_id" value="DEGRBEBB" required /></label>
+            <label>BA IBAN<input name="ba_id" value="BE37096123456702" required /></label>
+            <label>BB code<input name="bb_code" value="2000" /></label>
+            <label>Status
+              <select name="ack_status">
+                <option value="SUCCESS">SUCCESS</option>
+                <option value="FAILED">FAILED</option>
+                <option value="PENDING">PENDING</option>
+                <option value="TIMEOUT">TIMEOUT</option>
+              </select>
+            </label>
+            <label>Error code<input name="error_code" placeholder="bv. 4004" /></label>
+            <label class="full-row">Error description<input name="error_description" placeholder="optioneel" /></label>
+            <button class="primary-btn full-row" type="submit">Voeg toe aan ACK_IN</button>
+          </form>
+        </section>
+      </section>
+
+      <section id="bb-flow" class="page">
+        <div class="grid two-col">
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h3>PO_IN toevoegen</h3>
+                <p>Simuleert betaling die via CB bij onze bank binnenkomt.</p>
+              </div>
+            </div>
+            <form id="poInForm" class="form-grid wide-form">
+              <label>PO ID<input name="po_id" value="DEGRBEBB_DEMO_001" required /></label>
+              <label>Bedrag<input name="po_amount" type="number" step="0.01" value="90" required /></label>
+              <label>Message<input name="po_message" value="Incoming external payment" required /></label>
+              <label>OB BIC<input name="ob_id" value="DEGRBEBB" required /></label>
+              <label>OA IBAN<input name="oa_id" value="BE42096123456709" required /></label>
+              <label>OB code<input name="ob_code" value="2000" /></label>
+              <label>CB code<input name="cb_code" value="2000" /></label>
+              <label>BB BIC<input name="bb_id" value="BARCBEBB" required /></label>
+              <label>BA IBAN<input name="ba_id" value="BE15096123456710" required /></label>
+              <button class="primary-btn full-row" type="submit">Voeg toe aan PO_IN</button>
+            </form>
+          </section>
+
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h3>BB verwerking</h3>
+                <p>PO_IN → validatie → ACCOUNTS / TRANSACTIONS → ACK_OUT.</p>
+              </div>
+            </div>
+            <div class="quick-actions">
+              <button data-load="po_in" class="small-btn">Laad PO_IN</button>
+              <button data-process="po_in" class="primary-btn">Process PO_IN</button>
+              <button data-load="ack_out" class="small-btn">Laad ACK_OUT</button>
+            </div>
+            <div class="explain-box">
+              Als BA bestaat, wordt het bedrag bijgeschreven en komt er een ACK_OUT SUCCESS. Als BA niet bestaat, komt er een ACK_OUT FAILED.
+            </div>
+          </section>
+        </div>
+
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h3>BB tabellen</h3>
+              <p>PO_IN en ACK_OUT.</p>
+            </div>
+          </div>
+          <div id="bbTable" class="table-wrap"></div>
+        </section>
+      </section>
+
+      <section id="monitoring" class="page">
+        <div class="grid two-col">
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h3>Transactions</h3>
+                <p>Alle debits, credits en failed records.</p>
+              </div>
+              <button data-load="transactions" class="primary-btn">Laad transactions</button>
+            </div>
+            <div id="transactionsTable" class="table-wrap"></div>
+          </section>
+
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h3>Logs</h3>
+                <p>Audit trail van alle acties.</p>
+              </div>
+              <button data-load="logs" class="primary-btn">Laad logs</button>
+            </div>
+            <div id="logsTable" class="table-wrap"></div>
+          </section>
+        </div>
+
+        <div class="grid two-col">
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h3>Outstanding</h3>
+                <p>PO_OUT zonder ACK_IN.</p>
+              </div>
+              <button data-load="outstanding" class="primary-btn">Laad outstanding</button>
+            </div>
+            <div id="outstandingTable" class="table-wrap"></div>
+          </section>
+
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h3>Failed</h3>
+                <p>Gefaalde betalingen uit PO_NEW / ACK_IN / ACK_OUT.</p>
+              </div>
+              <button data-load="failed" class="primary-btn">Laad failed</button>
+            </div>
+            <div id="failedTable" class="table-wrap"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="scenarios" class="page">
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h3>Use case demo knoppen</h3>
+              <p>Deze knoppen maken voorbeelddata aan. Daarna kan je PO_NEW of PO_IN processen.</p>
+            </div>
+          </div>
+          <div id="scenarioCards" class="scenario-grid"></div>
+        </section>
+      </section>
+
+      <section id="docs" class="page">
+        <section class="card docs-card">
+          <h3>API documentatie</h3>
+          <p>Alle endpoints gebruiken dezelfde responsevorm: <code>{ ok, status, code, message, data }</code>.</p>
+          <div class="docs-list" id="docsList"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

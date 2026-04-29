@@ -1,0 +1,44 @@
+{
+  "info": {
+    "name": "PingFin Bank KBC API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    { "name": "help", "request": { "method": "GET", "url": "http://localhost:3000/api/help/" } },
+    { "name": "info", "request": { "method": "GET", "url": "http://localhost:3000/api/info/" } },
+    { "name": "accounts", "request": { "method": "GET", "url": "http://localhost:3000/api/accounts/" } },
+    { "name": "account by iban", "request": { "method": "GET", "url": "http://localhost:3000/api/accounts/BE64096123456701" } },
+    { "name": "po_new", "request": { "method": "GET", "url": "http://localhost:3000/api/po_new/" } },
+    {
+      "name": "po_new_add internal",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": [\n    {\n      \"po_amount\": 100,\n      \"po_message\": \"Manual internal payment\",\n      \"oa_id\": \"BE64096123456701\",\n      \"bb_id\": \"BARCBEBB\",\n      \"ba_id\": \"BE37096123456702\"\n    }\n  ]\n}"
+        },
+        "url": "http://localhost:3000/api/po_new_add/"
+      }
+    },
+    {
+      "name": "po_new_add external",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": [\n    {\n      \"po_amount\": 125,\n      \"po_message\": \"Manual external payment\",\n      \"oa_id\": \"BE64096123456701\",\n      \"bb_id\": \"DEGRBEBB\",\n      \"ba_id\": \"BE37096123456702\"\n    }\n  ]\n}"
+        },
+        "url": "http://localhost:3000/api/po_new_add/"
+      }
+    },
+    { "name": "po_new_process", "request": { "method": "GET", "url": "http://localhost:3000/api/po_new_process/" } },
+    { "name": "po_out", "request": { "method": "GET", "url": "http://localhost:3000/api/po_out/" } },
+    { "name": "ack_in", "request": { "method": "GET", "url": "http://localhost:3000/api/ack_in/" } },
+    { "name": "transactions", "request": { "method": "GET", "url": "http://localhost:3000/api/transactions/" } },
+    { "name": "logs", "request": { "method": "GET", "url": "http://localhost:3000/api/logs/" } },
+    { "name": "failed", "request": { "method": "GET", "url": "http://localhost:3000/api/failed/" } },
+    { "name": "db_check", "request": { "method": "GET", "url": "http://localhost:3000/api/db_check/" } }
+  ]
+}

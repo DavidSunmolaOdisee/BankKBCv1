@@ -1,0 +1,17 @@
+{
+  "name": "pingfin-bank-kbc",
+  "version": "1.0.0",
+  "description": "PingFin Bank KBC app container with Express API, GUI and MySQL via Docker Compose.",
+  "type": "module",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "check": "node Backend/scripts/check-syntax.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.14.1"
+  }
+}
