@@ -1,8 +1,6 @@
-const DEFAULT_API_BASE =
-  window.location.port === "5173"
-    ? "http://localhost:3000"
-    : window.location.origin;
-const BANK_BIC = "BARCBEBB"; // Bank KBC BIC from project mail/data
+const DEFAULT_API_BASE = window.location.origin;
+
+const BANK_BIC = "BARCBEBB"; // Barclays BIC
 const OTHER_BANK_BIC = "DEGRBEBB";
 
 const endpoints = {
