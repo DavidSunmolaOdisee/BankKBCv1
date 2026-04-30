@@ -15,7 +15,9 @@ const endpoints = {
   transactions: { path: "/api/transactions/", target: "transactionsTable", label: "Transactions" },
   logs: { path: "/api/logs/", target: "logsTable", label: "Logs" },
   outstanding: { path: "/api/outstanding/", target: "outstandingTable", label: "Outstanding" },
-  failed: { path: "/api/failed/", target: "failedTable", label: "Failed" }
+  failed: { path: "/api/failed/", target: "failedTable", label: "Failed" },
+  cb_banks: { path: "/api/cb/banks/", target: "cbTable", label: "CB Banks" },
+  cb_logs: { path: "/api/cb/logs/", target: "cbTable", label: "CB Logs" }
 };
 
 const docs = [
@@ -38,7 +40,13 @@ const docs = [
   ["/api/outstanding/", "GET", "v_outstanding_payments", "PO_OUT zonder ACK_IN"],
   ["/api/failed/", "GET", "v_failed_payments", "Gefaalde betalingen"],
   ["/api/logs/", "GET", "LOG", "Audit trail"],
-  ["/api/transactions/", "GET", "TRANSACTIONS", "Alle transacties"]
+  ["/api/transactions/", "GET", "TRANSACTIONS", "Alle transacties"],
+  ["/api/cb/token/", "GET", "Steven CB", "Token aanvragen en connectie testen"],
+  ["/api/cb/banks/", "GET", "Steven CB", "Bankenlijst ophalen"],
+  ["/api/cb/send-po-out/", "POST", "PO_OUT + Steven CB", "Lokale PO_OUT naar Steven /po_in sturen"],
+  ["/api/cb/fetch-po-in/?test=true", "GET", "Steven CB + PO_IN", "PO_OUT van Steven ophalen en opslaan als PO_IN"],
+  ["/api/cb/send-ack-out/", "POST", "ACK_OUT + Steven CB", "Lokale ACK_OUT naar Steven /ack_in sturen"],
+  ["/api/cb/fetch-ack-in/?test=true", "GET", "Steven CB + ACK_IN", "ACK_OUT van Steven ophalen en opslaan als ACK_IN"]
 ];
 
 const scenarios = [
@@ -191,6 +199,11 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function renderJson(targetId, value) {
+  const target = qs(`#${targetId}`);
+  target.innerHTML = `<pre class="json-output">${escapeHtml(JSON.stringify(value, null, 2))}</pre>`;
+}
+
 function renderTable(targetId, rows, title = "Data") {
   const target = qs(`#${targetId}`);
   const data = Array.isArray(rows) ? rows : rows ? [rows] : [];
@@ -326,6 +339,9 @@ async function refreshCurrentPage() {
   if (page === "monitoring") {
     await Promise.allSettled([loadEndpoint("transactions"), loadEndpoint("logs"), loadEndpoint("outstanding"), loadEndpoint("failed")]);
   }
+  if (page === "cb-flow") {
+    await loadEndpoint("cb_banks").catch(err => showToast(err.message, "error"));
+  }
 }
 
 function setupButtons() {
@@ -367,6 +383,45 @@ function setupButtons() {
         if (action === "processPoIn") await apiFetch("/api/po_in_process/");
         if (action === "loadOutstanding") switchPage("monitoring", "outstanding");
         if (action === "loadFailed") switchPage("monitoring", "failed");
+        if (action === "cbToken") {
+          const json = await apiFetch("/api/cb/token/?force=true");
+          switchPage("cb-flow");
+          renderJson("cbTable", json.data);
+        }
+        if (action === "cbBanks") {
+          switchPage("cb-flow");
+          await loadEndpoint("cb_banks");
+        }
+        if (action === "cbSendPoOut") {
+          const json = await apiFetch("/api/cb/send-po-out/", { method: "POST", body: JSON.stringify({}) });
+          switchPage("cb-flow");
+          renderJson("cbTable", json.data);
+        }
+        if (action === "cbFetchPoInTest") {
+          const json = await apiFetch("/api/cb/fetch-po-in/?test=true");
+          switchPage("cb-flow");
+          renderJson("cbTable", json.data);
+        }
+        if (action === "cbFetchPoInReal") {
+          const json = await apiFetch("/api/cb/fetch-po-in/?test=false");
+          switchPage("cb-flow");
+          renderJson("cbTable", json.data);
+        }
+        if (action === "cbSendAckOut") {
+          const json = await apiFetch("/api/cb/send-ack-out/", { method: "POST", body: JSON.stringify({}) });
+          switchPage("cb-flow");
+          renderJson("cbTable", json.data);
+        }
+        if (action === "cbFetchAckInTest") {
+          const json = await apiFetch("/api/cb/fetch-ack-in/?test=true");
+          switchPage("cb-flow");
+          renderJson("cbTable", json.data);
+        }
+        if (action === "cbFetchAckInReal") {
+          const json = await apiFetch("/api/cb/fetch-ack-in/?test=false");
+          switchPage("cb-flow");
+          renderJson("cbTable", json.data);
+        }
         showToast("Actie uitgevoerd.");
         await loadDashboard();
       } catch (err) { showToast(err.message, "error"); }

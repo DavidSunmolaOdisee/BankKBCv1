@@ -4,19 +4,21 @@ const membersFromEnv = (process.env.TEAM_MEMBERS || "Olusegun Sunmola,Team membe
   .filter(Boolean);
 
 export const BANK = {
-  bic: process.env.TEAM_BIC || "BARCBEBB",
-  name: process.env.TEAM_NAME || "Bank KBC",
-  team: process.env.TEAM_NAME || "Bank KBC",
+  bic: process.env.TEAM_BIC || process.env.BANK1_BIC || "BARCBEBB",
+  name: process.env.TEAM_NAME || process.env.BANK1_NAME || "Bank KBC",
+  team: process.env.TEAM_NAME || process.env.BANK1_NAME || "Bank KBC",
   description: "PingFin regular bank API. This bank can act as OB and BB.",
-  members: membersFromEnv
+  members: membersFromEnv,
+  secretKey: process.env.TEAM_SECRET_KEY || process.env.BANK1_SECRET || process.env.BANK1_SECRET_KEY || ""
 };
 
 export const OTHER_BANK = {
-  bic: process.env.OTHER_BANK_BIC || "DEGRBEBB",
-  name: process.env.OTHER_BANK_NAME || "Bank DEGR"
+  bic: process.env.OTHER_BANK_BIC || process.env.BANK2_BIC || "DEGRBEBB",
+  name: process.env.OTHER_BANK_NAME || process.env.BANK2_NAME || "Bank DEGR",
+  secretKey: process.env.OTHER_BANK_SECRET_KEY || process.env.BANK2_SECRET || process.env.BANK2_SECRET_KEY || ""
 };
 
-export const CB_API_BASE_URL = process.env.CB_API_BASE_URL || "https://stevenop.be/pingfin/api/v2";
+export const CB_API_BASE_URL = (process.env.CB_API_BASE_URL || process.env.CB_URL || "https://stevenop.be/pingfin/api/v2").replace(/\/$/, "");
 
 export const CODES = {
   OK: "2000",

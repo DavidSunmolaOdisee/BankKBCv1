@@ -1,8 +1,8 @@
+.git
+.env
 node_modules
 Backend/node_modules
 Frontend/node_modules
-Frontend/dist
-.git
-.env
 *.log
+npm-debug.log
 .DS_Store

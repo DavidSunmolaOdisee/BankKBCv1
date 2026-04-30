@@ -3,17 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PingFin Bank KBC Dashboard</title>
+  <title>Barclays Bank Dashboard</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar">
       <div class="brand">
-        <div class="brand-mark">PF</div>
+<div class="brand-mark">
+  <img src="./assets/barclays_logo.png" alt="Barclays Bank Ireland Plc Brussels Branch logo">
+</div>
         <div>
-          <h1>PingFin</h1>
-          <p>Bank KBC GUI</p>
+          <h1>Barclays Bank</h1>
         </div>
       </div>
 
@@ -22,6 +23,7 @@
         <button class="nav-btn" data-page="accounts">Accounts</button>
         <button class="nav-btn" data-page="ob-flow">OB Flow</button>
         <button class="nav-btn" data-page="bb-flow">BB Flow</button>
+        <button class="nav-btn" data-page="cb-flow">Centrale Bank</button>
         <button class="nav-btn" data-page="monitoring">Monitoring</button>
         <button class="nav-btn" data-page="scenarios">Use cases</button>
         <button class="nav-btn" data-page="docs">API docs</button>
@@ -41,7 +43,7 @@
     <main class="content">
       <header class="topbar">
         <div>
-          <p class="eyebrow">Bank KBC · BARCBEBB · Docker MySQL · Node.js Express</p>
+          <p class="eyebrow">Bank Barclays  · BARCBEBB · Docker MySQL · Node.js Express</p>
           <h2 id="pageTitle">Dashboard</h2>
         </div>
         <div class="top-actions">
@@ -89,6 +91,7 @@
               <button data-action="processPoIn" class="primary-btn">Verwerk PO_IN</button>
               <button data-action="loadOutstanding" class="ghost-btn">Bekijk outstanding</button>
               <button data-action="loadFailed" class="ghost-btn">Bekijk failed</button>
+              <button data-action="cbBanks" class="ghost-btn">Test Centrale Bank</button>
             </div>
           </section>
 
@@ -253,6 +256,24 @@
           </div>
           <div id="bbTable" class="table-wrap"></div>
         </section>
+      </section>
+
+      <section id="cb-flow" class="page">
+        <section class="card">
+          <div class="card-header"><div><h3>Clearing Bank integratie</h3><p>Echte requests naar https://stevenop.be/pingfin/api/v2 via jouw backend.</p></div></div>
+          <div class="quick-actions">
+            <button data-action="cbToken" class="primary-btn">1. Token testen</button>
+            <button data-action="cbBanks" class="primary-btn">2. Bankenlijst ophalen</button>
+            <button data-action="cbSendPoOut" class="primary-btn">3. PO_OUT naar CB sturen</button>
+            <button data-action="cbFetchPoInTest" class="ghost-btn">4. PO_IN ophalen TEST</button>
+            <button data-action="cbFetchPoInReal" class="ghost-btn">4b. PO_IN echt ophalen</button>
+            <button data-action="cbSendAckOut" class="primary-btn">5. ACK_OUT naar CB sturen</button>
+            <button data-action="cbFetchAckInTest" class="ghost-btn">6. ACK_IN ophalen TEST</button>
+            <button data-action="cbFetchAckInReal" class="ghost-btn">6b. ACK_IN echt ophalen</button>
+          </div>
+          <div class="explain-box">Veilige testflow: token testen → banken ophalen → lokale externe PO maken en Process PO_NEW → PO_OUT naar CB sturen.</div>
+        </section>
+        <section class="card"><div class="card-header"><div><h3>CB resultaat</h3><p>Response van Centrale Bank.</p></div></div><div id="cbTable" class="table-wrap"></div></section>
       </section>
 
       <section id="monitoring" class="page">

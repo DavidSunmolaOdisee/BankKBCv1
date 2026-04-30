@@ -9,6 +9,7 @@ import infoRoutes from "./routes/info.js";
 import accountRoutes from "./routes/accounts.js";
 import poRoutes from "./routes/paymentOrders.js";
 import utilityRoutes from "./routes/utility.js";
+import cbRoutes from "./routes/cb.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
@@ -28,6 +29,7 @@ app.use("/api", infoRoutes);
 app.use("/api", accountRoutes);
 app.use("/api", poRoutes);
 app.use("/api", utilityRoutes);
+app.use("/api", cbRoutes);
 
 app.use(express.static(publicDir));
 app.get(/^\/(?!api).*/, (_req, res) => {

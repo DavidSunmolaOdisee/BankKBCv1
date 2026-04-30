@@ -50,14 +50,22 @@ button { cursor: pointer; }
 }
 
 .brand-mark {
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #4f7cff, #35d0ba);
-  display: grid;
-  place-items: center;
-  font-weight: 900;
-  letter-spacing: -1px;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 6px;
 }
 
 .brand h1 { margin: 0; font-size: 24px; }
@@ -222,4 +230,15 @@ td code { white-space: nowrap; }
   .form-grid, .wide-form, .compact-form { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: 1fr; }
   .docs-row { grid-template-columns: 1fr; }
+}
+
+.json-output {
+  background: #0f172a;
+  color: #e5e7eb;
+  border-radius: 14px;
+  padding: 16px;
+  overflow: auto;
+  max-height: 520px;
+  font-size: 13px;
+  line-height: 1.5;
 }

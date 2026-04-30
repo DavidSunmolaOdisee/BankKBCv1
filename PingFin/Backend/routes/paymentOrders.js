@@ -53,6 +53,16 @@ router.get("/po_in/", async (_req, res, next) => {
   try { const rows = await getTableRows("PO_IN", "po_datetime DESC"); sendOk(res, `${rows.length} PO_IN rows found.`, rows); } catch (err) { next(err); }
 });
 
+// External alias: POST /api/po_in/ behaves like /api/po_in_add/
+router.post("/po_in/", async (req, res, next) => {
+  try {
+    const list = readBodyList(req);
+    if (!list) return sendBadRequest(res, "Body must be JSON: { data: [ ...paymentOrders ] }.");
+    const result = await addPoInList(list.map((item, index) => buildPo(item, index + 1)));
+    sendCreated(res, `${result.length} incoming payment orders handled.`, result);
+  } catch (err) { next(err); }
+});
+
 router.post("/po_in_add/", async (req, res, next) => {
   try {
     const list = readBodyList(req);
@@ -68,6 +78,16 @@ router.get("/po_in_process/", async (_req, res, next) => {
 
 router.get("/ack_in/", async (_req, res, next) => {
   try { const rows = await getTableRows("ACK_IN", "received_at DESC"); sendOk(res, `${rows.length} ACK_IN rows found.`, rows); } catch (err) { next(err); }
+});
+
+// External alias: POST /api/ack_in/ behaves like /api/ack_in_add/
+router.post("/ack_in/", async (req, res, next) => {
+  try {
+    const list = readBodyList(req);
+    if (!list) return sendBadRequest(res, "Body must be JSON: { data: [ ...acknowledgements ] }.");
+    const result = await addAckInList(list.map((item, index) => buildPo(item, index + 1)));
+    sendCreated(res, `${result.length} acknowledgements handled.`, result);
+  } catch (err) { next(err); }
 });
 
 router.post("/ack_in_add/", async (req, res, next) => {
