@@ -1,5 +1,12 @@
 const DEFAULT_API_BASE = window.location.origin;
 
+let apiBase = localStorage.getItem("pingfinApiBase") || DEFAULT_API_BASE;
+
+const apiBaseInput = document.getElementById("apiBase");
+if (apiBaseInput) {
+  apiBaseInput.value = apiBase;
+}
+
 const BANK_BIC = "BARCBEBB"; // Barclays BIC
 const OTHER_BANK_BIC = "DEGRBEBB";
 
@@ -187,6 +194,8 @@ async function apiFetch(path, options = {}) {
   }
   return json;
 }
+
+
 
 function escapeHtml(value) {
   return String(value ?? "")
