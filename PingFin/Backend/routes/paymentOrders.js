@@ -20,15 +20,72 @@ router.post("/po_new_add/", async (req, res, next) => {
   try {
     const list = readBodyList(req);
     if (!list) return sendBadRequest(res, "Body must be JSON: { data: [ ...paymentOrders ] }.");
-    const paymentOrders = [];
-    const rejected = [];
-    list.forEach((item, index) => {
-      const validation = validatePoShape(item);
-      if (!validation.valid) rejected.push({ index, code: validation.code, message: validation.message, input: item });
-      else paymentOrders.push(buildPo(item, index + 1));
+const paymentOrders = [];
+const rejected = [];
+
+for (let index = 0; index < list.length; index++) {
+  const item = list[index];
+  const validation = validatePoShape(item);
+
+  if (!validation.valid) {
+    rejected.push({
+      index,
+      code: validation.code,
+      message: validation.message,
+      input: item
     });
-    const result = await addPoNewList(paymentOrders);
-    sendCreated(res, `${result.inserted.length} payment orders added to PO_NEW.`, { inserted: result.inserted, skipped: result.skipped, rejected });
+
+    await pool.query(
+      `INSERT INTO LOG
+        (message, type, po_id, po_amount, po_message, po_datetime,
+         ob_id, oa_id, ob_code, ob_datetime,
+         cb_code, cb_datetime,
+         bb_id, ba_id, bb_code, bb_datetime)
+       VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, ?, NOW(), NULL, NULL, ?, ?, NULL, NULL)`,
+      [
+        `PO_NEW rejected: ${validation.message}`,
+        "po_new_rejected",
+        item.po_id ?? null,
+        item.po_amount ?? null,
+        item.po_message ?? null,
+        "BARCBEBB",
+        item.oa_id ?? null,
+        validation.code,
+        item.bb_id ?? null,
+        item.ba_id ?? null
+      ]
+    );
+
+    continue;
+  }
+
+  paymentOrders.push(buildPo(item, index + 1));
+}
+
+const result = await addPoNewList(paymentOrders);
+    if (result.inserted.length === 0 && rejected.length > 0) {
+  return res.status(400).json({
+    ok: false,
+    status: 400,
+    code: rejected[0].code,
+    message: "No payment orders added. One or more payment orders were rejected.",
+    data: {
+      inserted: [],
+      skipped: result.skipped,
+      rejected
+    }
+  });
+}
+
+return sendCreated(
+  res,
+  `${result.inserted.length} payment orders added to PO_NEW.`,
+  {
+    inserted: result.inserted,
+    skipped: result.skipped,
+    rejected
+  }
+);
   } catch (err) { next(err); }
 });
 
