@@ -13,8 +13,8 @@ export const BANK = {
 };
 
 export const OTHER_BANK = {
-  bic: process.env.OTHER_BANK_BIC || process.env.BANK2_BIC || "DEGRBEBB",
-  name: process.env.OTHER_BANK_NAME || process.env.BANK2_NAME || "Bank DEGR",
+  bic: process.env.OTHER_BANK_BIC || process.env.BANK2_BIC || "BBRUBEBB",
+  name: process.env.OTHER_BANK_NAME || process.env.BANK2_NAME || "Bankius",
   secretKey: process.env.OTHER_BANK_SECRET_KEY || process.env.BANK2_SECRET || process.env.BANK2_SECRET_KEY || ""
 };
 

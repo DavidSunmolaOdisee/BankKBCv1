@@ -24,6 +24,31 @@ function endpoint(path) {
   return `${CB_API_BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+function toCbDatetime(value) {
+  if (!value) return value ?? null;
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value)) return value;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return toSqlDatetime(date);
+}
+
+function normalizeCbRecord(record) {
+  return {
+    ...record,
+    po_datetime: toCbDatetime(record.po_datetime),
+    ob_datetime: toCbDatetime(record.ob_datetime),
+    cb_datetime: toCbDatetime(record.cb_datetime),
+    bb_datetime: toCbDatetime(record.bb_datetime)
+  };
+}
+
+function failedPoIdsFromCbResponse(response) {
+  const failures = Array.isArray(response?.fouten) ? response.fouten : [];
+  return new Set(failures.map((failure) => failure?.po_id).filter(Boolean));
+}
+
 async function readJsonResponse(response) {
   const text = await response.text();
   let json;
@@ -49,6 +74,7 @@ export async function getCentralBankToken(bank = "A", { forceRefresh = false } =
 
   const response = await fetch(endpoint("/token"), {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ bic: config.bic, secret_key: config.secretKey })
   });
 
@@ -85,7 +111,17 @@ export async function getCentralBankBanks(bank = "A") {
 }
 
 export async function updateCentralBankBankInfo({ bank = "A", name = BANK.name, members = BANK.members.join(", ") } = {}) {
-  return authorizedCbFetch("/banks", { bank, method: "POST", body: { name, members } });
+  const config = bankConfig(bank);
+  return authorizedCbFetch("/banks", {
+    bank,
+    method: "POST",
+    body: {
+      id: config.bic,
+      name,
+      members,
+      description: members
+    }
+  });
 }
 
 export async function getCentralBankStats(bank = "A") {
@@ -114,7 +150,7 @@ export async function sendPoOutToCentralBank({ bank = "A", poId = null, includeA
     return { sent_count: 0, sent: [], cb: null, message: "No PO_OUT rows ready to send." };
   }
 
-  const poList = rows.map((row) => ({
+  const poList = rows.map((row) => normalizeCbRecord({
     po_id: row.po_id,
     po_amount: Number(row.po_amount),
     po_message: row.po_message,
@@ -129,19 +165,33 @@ export async function sendPoOutToCentralBank({ bank = "A", poId = null, includeA
 
   const cb = await authorizedCbFetch("/po_in", { bank, method: "POST", body: { data: poList } });
   const now = toSqlDatetime();
+  const failedPoIds = failedPoIdsFromCbResponse(cb.response);
+  const accepted = poList.filter((po) => !failedPoIds.has(po.po_id));
+  const failed = poList.filter((po) => failedPoIds.has(po.po_id));
 
-  for (const po of poList) {
+  for (const po of accepted) {
     await pool.query("UPDATE PO_OUT SET status = 'SENT_TO_CB_API', sent_at = ? WHERE po_id = ?", [now, po.po_id]);
     await writeLog({ type: "cb_po_in", message: `PO_OUT sent to Steven CB: ${po.po_id}`, po });
   }
 
-  return { sent_count: poList.length, sent: poList, cb: cb.response };
+  for (const po of failed) {
+    await writeLog({ type: "cb_po_in_failed", message: `PO_OUT rejected by CB: ${po.po_id}`, po });
+  }
+
+  return {
+    attempted_count: poList.length,
+    sent_count: accepted.length,
+    failed_count: failed.length,
+    sent: accepted,
+    failed,
+    cb: cb.response
+  };
 }
 
 export async function fetchPoInFromCentralBank({ bank = "A", test = true } = {}) {
   const path = test ? "/po_out/test/true" : "/po_out";
   const cb = await authorizedCbFetch(path, { bank });
-  const poList = normalizeList(cb.response.data);
+  const poList = normalizeList(cb.response.data).map(normalizeCbRecord);
 
   if (!poList.length) {
     return { received_count: 0, stored: [], cb: cb.response, message: "No incoming PO found at CB." };
@@ -167,7 +217,7 @@ export async function sendAckOutToCentralBank({ bank = "A", poId = null, include
     return { sent_count: 0, sent: [], cb: null, message: "No ACK_OUT rows found." };
   }
 
-  const ackList = rows.map((row) => ({
+  const ackList = rows.map((row) => normalizeCbRecord({
     po_id: row.po_id,
     po_amount: Number(row.po_amount),
     po_message: row.po_message,
@@ -185,18 +235,33 @@ export async function sendAckOutToCentralBank({ bank = "A", poId = null, include
   }));
 
   const cb = await authorizedCbFetch("/ack_in", { bank, method: "POST", body: { data: ackList } });
+  const failedPoIds = failedPoIdsFromCbResponse(cb.response);
+  const accepted = ackList.filter((ack) => !failedPoIds.has(ack.po_id));
+  const failed = ackList.filter((ack) => failedPoIds.has(ack.po_id));
 
-  for (const ack of ackList) {
+  for (const ack of accepted) {
+    await pool.query("UPDATE ACK_OUT SET sent_at = ? WHERE po_id = ?", [toSqlDatetime(), ack.po_id]);
     await writeLog({ type: "cb_ack_in", message: `ACK_OUT sent to Steven CB: ${ack.po_id}`, po: ack });
   }
 
-  return { sent_count: ackList.length, sent: ackList, cb: cb.response };
+  for (const ack of failed) {
+    await writeLog({ type: "cb_ack_in_failed", message: `ACK_OUT rejected by CB: ${ack.po_id}`, po: ack });
+  }
+
+  return {
+    attempted_count: ackList.length,
+    sent_count: accepted.length,
+    failed_count: failed.length,
+    sent: accepted,
+    failed,
+    cb: cb.response
+  };
 }
 
 export async function fetchAckInFromCentralBank({ bank = "A", test = true } = {}) {
   const path = test ? "/ack_out/test/true" : "/ack_out";
   const cb = await authorizedCbFetch(path, { bank });
-  const ackList = normalizeList(cb.response.data);
+  const ackList = normalizeList(cb.response.data).map(normalizeCbRecord);
 
   if (!ackList.length) {
     return { received_count: 0, stored: [], cb: cb.response, message: "No incoming ACK found at CB." };

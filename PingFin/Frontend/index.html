@@ -188,7 +188,7 @@
             <label>OA IBAN<input name="oa_id" value="BE64096123456701" required /></label>
             <label>OB code<input name="ob_code" value="2000" /></label>
             <label>CB code<input name="cb_code" value="2000" /></label>
-            <label>BB BIC<input name="bb_id" value="DEGRBEBB" required /></label>
+            <label>BB BIC<input name="bb_id" value="BBRUBEBB" required /></label>
             <label>BA IBAN<input name="ba_id" value="BE37096123456702" required /></label>
             <label>BB code<input name="bb_code" value="2000" /></label>
             <label>Status
@@ -216,10 +216,10 @@
               </div>
             </div>
             <form id="poInForm" class="form-grid wide-form">
-              <label>PO ID<input name="po_id" value="DEGRBEBB_DEMO_001" required /></label>
+              <label>PO ID<input name="po_id" value="BBRUBEBB_DEMO_001" required /></label>
               <label>Bedrag<input name="po_amount" type="number" step="0.01" value="90" required /></label>
               <label>Message<input name="po_message" value="Incoming external payment" required /></label>
-              <label>OB BIC<input name="ob_id" value="DEGRBEBB" required /></label>
+              <label>OB BIC<input name="ob_id" value="BBRUBEBB" required /></label>
               <label>OA IBAN<input name="oa_id" value="BE42096123456709" required /></label>
               <label>OB code<input name="ob_code" value="2000" /></label>
               <label>CB code<input name="cb_code" value="2000" /></label>
@@ -263,13 +263,14 @@
           <div class="card-header"><div><h3>Clearing Bank integratie</h3><p>Echte requests naar https://stevenop.be/pingfin/api/v2 via jouw backend.</p></div></div>
           <div class="quick-actions">
             <button data-action="cbToken" class="primary-btn">1. Token testen</button>
-            <button data-action="cbBanks" class="primary-btn">2. Bankenlijst ophalen</button>
-            <button data-action="cbSendPoOut" class="primary-btn">3. PO_OUT naar CB sturen</button>
-            <button data-action="cbFetchPoInTest" class="ghost-btn">4. PO_IN ophalen TEST</button>
-            <button data-action="cbFetchPoInReal" class="ghost-btn">4b. PO_IN echt ophalen</button>
-            <button data-action="cbSendAckOut" class="primary-btn">5. ACK_OUT naar CB sturen</button>
-            <button data-action="cbFetchAckInTest" class="ghost-btn">6. ACK_IN ophalen TEST</button>
-            <button data-action="cbFetchAckInReal" class="ghost-btn">6b. ACK_IN echt ophalen</button>
+            <button data-action="cbRegisterBank" class="primary-btn">2. Bank registreren</button>
+            <button data-action="cbBanks" class="primary-btn">3. Bankenlijst ophalen</button>
+            <button data-action="cbSendPoOut" class="primary-btn">4. PO_OUT naar CB sturen</button>
+            <button data-action="cbFetchPoInTest" class="ghost-btn">5. PO_IN ophalen TEST</button>
+            <button data-action="cbFetchPoInReal" class="ghost-btn">5b. PO_IN echt ophalen</button>
+            <button data-action="cbSendAckOut" class="primary-btn">6. ACK_OUT naar CB sturen</button>
+            <button data-action="cbFetchAckInTest" class="ghost-btn">7. ACK_IN ophalen TEST</button>
+            <button data-action="cbFetchAckInReal" class="ghost-btn">7b. ACK_IN echt ophalen</button>
           </div>
           <div class="explain-box">Veilige testflow: token testen → banken ophalen → lokale externe PO maken en Process PO_NEW → PO_OUT naar CB sturen.</div>
         </section>

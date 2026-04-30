@@ -8,7 +8,7 @@ if (apiBaseInput) {
 }
 
 const BANK_BIC = "BARCBEBB"; // Barclays BIC
-const OTHER_BANK_BIC = "DEGRBEBB";
+const OTHER_BANK_BIC = "BBRUBEBB";
 
 const endpoints = {
   accounts: { path: "/api/accounts/", target: "accountsTable", label: "Accounts" },
@@ -47,6 +47,7 @@ const docs = [
   ["/api/logs/", "GET", "LOG", "Audit trail"],
   ["/api/transactions/", "GET", "TRANSACTIONS", "Alle transacties"],
   ["/api/cb/token/", "GET", "Steven CB", "Token aanvragen en connectie testen"],
+  ["/api/cb/banks/", "POST", "Steven CB", "Eigen bank registreren of updaten"],
   ["/api/cb/banks/", "GET", "Steven CB", "Bankenlijst ophalen"],
   ["/api/cb/send-po-out/", "POST", "PO_OUT + Steven CB", "Lokale PO_OUT naar Steven /po_in sturen"],
   ["/api/cb/fetch-po-in/?test=true", "GET", "Steven CB + PO_IN", "PO_OUT van Steven ophalen en opslaan als PO_IN"],
@@ -392,6 +393,11 @@ function setupButtons() {
         if (action === "loadFailed") switchPage("monitoring", "failed");
         if (action === "cbToken") {
           const json = await apiFetch("/api/cb/token/?force=true");
+          switchPage("cb-flow");
+          renderJson("cbTable", json.data);
+        }
+        if (action === "cbRegisterBank") {
+          const json = await apiFetch("/api/cb/banks/", { method: "POST", body: JSON.stringify({}) });
           switchPage("cb-flow");
           renderJson("cbTable", json.data);
         }

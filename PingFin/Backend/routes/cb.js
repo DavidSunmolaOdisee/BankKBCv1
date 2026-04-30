@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { sendBadRequest, sendCreated, sendOk } from "../services/response.js";
+import { BANK } from "../services/config.js";
 import {
   fetchAckInFromCentralBank,
   fetchPoInFromCentralBank,
@@ -45,7 +46,8 @@ router.get("/cb/banks/", async (req, res, next) => {
 
 router.post("/cb/banks/", async (req, res, next) => {
   try {
-    const { name, members } = req.body || {};
+    const name = req.body?.name || BANK.name;
+    const members = req.body?.members || BANK.members.join(", ");
     if (!name || !members) return sendBadRequest(res, "Body must contain name and members.");
     const result = await updateCentralBankBankInfo({ bank: readBank(req), name, members });
     sendOk(res, "Bank info updated at central bank.", result.response);
